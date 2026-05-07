@@ -1,0 +1,87 @@
+# quality-gate.yml
+# Métricas padrão manipuláveis para o Quality Gate.
+# Ajuste os valores conforme a maturidade do seu projeto.
+
+project:
+  name: "my-project"
+  root: "."
+  baseline_mode: true
+
+scan:
+  include_extensions:
+    - ".java"
+    - ".kt"
+    - ".js"
+    - ".jsx"
+    - ".ts"
+    - ".tsx"
+    - ".py"
+    - ".go"
+    - ".cs"
+  exclude_dirs:
+    - ".git"
+    - "node_modules"
+    - "dist"
+    - "build"
+    - "coverage"
+    - "target"
+    - ".angular"
+    - ".idea"
+    - ".vscode"
+    - "__pycache__"
+  exclude_files:
+    - "*.min.js"
+    - "*.bundle.js"
+    - "*.generated.*"
+    - "*.g.dart"
+
+thresholds:
+  # Readability / Maintainability
+  max_lines_per_file: 400
+  max_function_duplicates_allowed: 0
+  max_files_over_line_limit_allowed: 0
+
+  # Reliability
+  min_coverage_percent: 80
+
+  # Modularity
+  warn_lines_per_file: 250
+
+  # Efficiency / Hygiene
+  max_total_files_scanned: 5000
+
+coverage:
+  enabled: true
+  # Exemplos:
+  # Angular/JS/TS: coverage/lcov.info
+  # Java/Jacoco: target/site/jacoco/jacoco.xml
+  # Python/Cobertura: coverage.xml
+  paths:
+    - "coverage/lcov.info"
+    - "coverage/lcov-report/lcov.info"
+    - "target/site/jacoco/jacoco.xml"
+    - "coverage.xml"
+  fail_if_missing: false
+
+reports:
+  output_dir: "quality-gate-report"
+  json_file: "quality-gate-report.json"
+  html_file: "quality-gate-report.html"
+
+rules:
+  duplicated_functions:
+    enabled: true
+    # Nomes muito comuns podem gerar falso positivo em alguns projetos.
+    ignore_names:
+      - "toString"
+      - "equals"
+      - "hashCode"
+      - "constructor"
+      - "ngOnInit"
+      - "ngOnDestroy"
+
+  file_lines:
+    enabled: true
+
+  coverage:
+    enabled: true
