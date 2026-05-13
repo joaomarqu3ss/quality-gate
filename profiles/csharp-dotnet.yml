@@ -1,0 +1,28 @@
+scan:
+  include_extensions:
+    - ".cs"
+    - ".csx"
+  exclude_dirs:
+    - ".git"
+    - "bin"
+    - "obj"
+    - "TestResults"
+    - ".idea"
+    - ".vscode"
+  exclude_files:
+    - "*.g.cs"
+    - "*.designer.cs"
+    - "*.generated.cs"
+
+coverage:
+  paths:
+    - "coverage.xml"
+    - "coverage/cobertura.xml"
+    - "TestResults/coverage.cobertura.xml"
+
+rules:
+  duplicated_functions:
+    ignore_names:
+      - "ToString"
+      - "Equals"
+      - "GetHashCode"

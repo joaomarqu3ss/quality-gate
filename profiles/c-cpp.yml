@@ -1,0 +1,27 @@
+scan:
+  include_extensions:
+    - ".c"
+    - ".h"
+    - ".cc"
+    - ".cpp"
+    - ".cxx"
+    - ".hh"
+    - ".hpp"
+    - ".hxx"
+  exclude_dirs:
+    - ".git"
+    - "build"
+    - "cmake-build-debug"
+    - "cmake-build-release"
+    - "coverage"
+    - ".idea"
+    - ".vscode"
+  exclude_files:
+    - "*.generated.*"
+
+coverage:
+  paths:
+    - "coverage/lcov.info"
+    - "lcov.info"
+    - "coverage/coverage.info"
+    - "build/coverage.info"

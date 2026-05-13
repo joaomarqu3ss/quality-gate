@@ -15,6 +15,7 @@ Ele foi pensado para reforçar os pilares de **High Quality Code**:
 ```text
 quality_gate.py      # CLI principal
 quality-gate.yml     # métricas padrão manipuláveis
+profiles/            # perfis por stack para CI/CD
 README.md            # este guia
 ```
 
@@ -32,6 +33,14 @@ Na raiz do projeto:
 
 ```bash
 python quality_gate.py --config quality-gate.yml --root .
+```
+
+Use um profile quando quiser aplicar defaults por stack:
+
+```bash
+python quality_gate.py --config quality-gate.yml --profile rust --root .
+python quality_gate.py --config quality-gate.yml --profile c-cpp --root .
+python quality_gate.py --config quality-gate.yml --profile java-spring --root .
 ```
 
 O processo retorna:
@@ -57,6 +66,36 @@ quality-gate-report/quality-gate-report.json
 quality-gate-report/quality-gate-report.html
 ```
 
+## Profiles por stack
+
+Os profiles ficam em `profiles/` e são aplicados antes do `quality-gate.yml`.
+O config versionado já usa `profile: "default"`, e em CI você pode trocar por
+`--profile rust`, `--profile node`, `--profile c-cpp` etc. Isso permite manter
+um padrão por stack e sobrescrever limites localmente no config do projeto.
+
+Profiles disponíveis:
+
+```text
+profiles/default.yml
+profiles/java-spring.yml
+profiles/angular.yml
+profiles/csharp-dotnet.yml
+profiles/node.yml
+profiles/python.yml
+profiles/rust.yml
+profiles/c-cpp.yml
+```
+
+Também é possível apontar para um YAML específico:
+
+```bash
+python quality_gate.py --config quality-gate.yml --profile profiles/rust.yml --root .
+```
+
+O merge preserva listas sem duplicar itens. Assim, extensões, diretórios
+ignorados e caminhos de coverage do profile podem ser combinados com ajustes do
+projeto.
+
 ## Coverage
 
 O script tenta ler automaticamente:
@@ -66,6 +105,11 @@ coverage/lcov.info
 coverage/lcov-report/lcov.info
 target/site/jacoco/jacoco.xml
 coverage.xml
+cobertura.xml
+coverage/cobertura.xml
+coverage/tarpaulin.xml
+target/llvm-cov/lcov.info
+coverage/coverage.info
 ```
 
 ### Angular / TypeScript
@@ -96,6 +140,32 @@ Exemplo:
 coverage run -m pytest
 coverage xml
 python quality_gate.py --config quality-gate.yml --root .
+```
+
+### Rust
+
+Use o profile Rust e gere coverage em Cobertura/XML ou lcov:
+
+```bash
+cargo tarpaulin --out Xml --output-dir coverage
+python quality_gate.py --config quality-gate.yml --profile rust --root .
+```
+
+Ou com `cargo llvm-cov`:
+
+```bash
+cargo llvm-cov --lcov --output-path target/llvm-cov/lcov.info
+python quality_gate.py --config quality-gate.yml --profile rust --root .
+```
+
+### C / C++
+
+Use o profile `c-cpp`. O gate valida arquivos `.c`, `.h`, `.cc`, `.cpp`,
+`.cxx`, `.hh`, `.hpp` e `.hxx`, incluindo tamanho por arquivo e assinaturas de
+funções repetidas.
+
+```bash
+python quality_gate.py --config quality-gate.yml --profile c-cpp --root .
 ```
 
 ## Exemplo para GitHub Actions

@@ -1,0 +1,19 @@
+scan:
+  include_extensions:
+    - ".rs"
+  exclude_dirs:
+    - ".git"
+    - "target"
+    - ".cargo"
+    - ".idea"
+    - ".vscode"
+  exclude_files:
+    - "*.generated.rs"
+
+coverage:
+  paths:
+    - "coverage/tarpaulin.xml"
+    - "cobertura.xml"
+    - "coverage/cobertura.xml"
+    - "target/llvm-cov/lcov.info"
+    - "lcov.info"

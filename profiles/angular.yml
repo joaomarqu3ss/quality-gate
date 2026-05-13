@@ -1,0 +1,30 @@
+scan:
+  include_extensions:
+    - ".ts"
+    - ".tsx"
+    - ".html"
+    - ".scss"
+    - ".css"
+  exclude_dirs:
+    - ".git"
+    - "node_modules"
+    - "dist"
+    - "coverage"
+    - ".angular"
+    - ".idea"
+    - ".vscode"
+  exclude_files:
+    - "*.min.js"
+    - "*.bundle.js"
+    - "*.generated.*"
+
+coverage:
+  paths:
+    - "coverage/lcov.info"
+    - "coverage/lcov-report/lcov.info"
+
+rules:
+  duplicated_functions:
+    ignore_names:
+      - "ngOnInit"
+      - "ngOnDestroy"

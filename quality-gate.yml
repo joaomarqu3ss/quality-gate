@@ -2,22 +2,16 @@
 # Métricas padrão manipuláveis para o Quality Gate.
 # Ajuste os valores conforme a maturidade do seu projeto.
 
+profile: "default"
+
 project:
   name: "my-project"
   root: "."
   baseline_mode: true
 
+# Opcional: sobrescreva com --profile rust, --profile node etc. em CI.
+
 scan:
-  include_extensions:
-    - ".java"
-    - ".kt"
-    - ".js"
-    - ".jsx"
-    - ".ts"
-    - ".tsx"
-    - ".py"
-    - ".go"
-    - ".cs"
   exclude_dirs:
     - ".git"
     - "node_modules"
@@ -56,11 +50,18 @@ coverage:
   # Angular/JS/TS: coverage/lcov.info
   # Java/Jacoco: target/site/jacoco/jacoco.xml
   # Python/Cobertura: coverage.xml
+  # Rust: coverage/tarpaulin.xml ou target/llvm-cov/lcov.info
+  # C/C++: coverage/coverage.info ou lcov.info
   paths:
     - "coverage/lcov.info"
     - "coverage/lcov-report/lcov.info"
     - "target/site/jacoco/jacoco.xml"
     - "coverage.xml"
+    - "cobertura.xml"
+    - "coverage/cobertura.xml"
+    - "coverage/tarpaulin.xml"
+    - "target/llvm-cov/lcov.info"
+    - "coverage/coverage.info"
   fail_if_missing: false
 
 reports:

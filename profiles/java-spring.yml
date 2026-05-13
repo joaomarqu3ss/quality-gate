@@ -1,0 +1,26 @@
+scan:
+  include_extensions:
+    - ".java"
+    - ".kt"
+    - ".kts"
+  exclude_dirs:
+    - ".git"
+    - "target"
+    - "build"
+    - ".gradle"
+    - ".idea"
+    - ".vscode"
+  exclude_files:
+    - "*.generated.*"
+
+coverage:
+  paths:
+    - "target/site/jacoco/jacoco.xml"
+    - "build/reports/jacoco/test/jacocoTestReport.xml"
+
+rules:
+  duplicated_functions:
+    ignore_names:
+      - "toString"
+      - "equals"
+      - "hashCode"

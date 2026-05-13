@@ -1,0 +1,29 @@
+scan:
+  include_extensions:
+    - ".js"
+    - ".jsx"
+    - ".ts"
+    - ".tsx"
+    - ".mjs"
+    - ".cjs"
+    - ".mts"
+    - ".cts"
+  exclude_dirs:
+    - ".git"
+    - "node_modules"
+    - "dist"
+    - "build"
+    - "coverage"
+    - ".next"
+    - "out"
+    - ".idea"
+    - ".vscode"
+  exclude_files:
+    - "*.min.js"
+    - "*.bundle.js"
+    - "*.generated.*"
+
+coverage:
+  paths:
+    - "coverage/lcov.info"
+    - "coverage/lcov-report/lcov.info"
