@@ -10,6 +10,7 @@ scan:
     - ".go"
     - ".cs"
     - ".rs"
+    - ".dart"
     - ".c"
     - ".h"
     - ".cc"
@@ -25,6 +26,7 @@ scan:
     - "build"
     - "coverage"
     - "target"
+    - ".dart_tool"
     - ".angular"
     - ".idea"
     - ".vscode"
@@ -46,3 +48,26 @@ coverage:
     - "coverage/tarpaulin.xml"
     - "target/llvm-cov/lcov.info"
     - "coverage/coverage.info"
+
+documentation:
+  include_extensions:
+    - ".md"
+    - ".markdown"
+  exclude_dirs:
+    - ".git"
+    - "node_modules"
+    - "dist"
+    - "build"
+    - "coverage"
+    - "target"
+    - ".dart_tool"
+    - ".angular"
+    - ".idea"
+    - ".vscode"
+    - "__pycache__"
+    - "quality-gate-report"
+  exclude_files: []
+  max_lines_per_doc: 300
+  max_section_lines: 120
+  max_heading_depth: 4
+  require_h1: true

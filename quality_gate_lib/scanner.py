@@ -103,6 +103,13 @@ FUNCTION_PATTERNS: List[Tuple[str, re.Pattern[str]]] = [
         ),
     ),
     (
+        "dart_function",
+        re.compile(
+            r"^\s*(?:@\w+(?:\([^)]*\))?\s*)*(?:(?:external|static|abstract|factory)\s+)*(?:[A-Za-z_$][\w$<>,? .\[\]]+\s+)?([A-Za-z_$][\w$]*)\s*\(([^)]*)\)\s*(?:async\*?|sync\*?)?\s*(?:=>|\{)",
+            re.MULTILINE,
+        ),
+    ),
+    (
         "c_cpp_function",
         re.compile(
             r"^\s*(?!(?:if|for|while|switch|catch|return)\b)(?:[A-Za-z_][\w:<>,\s\*\&\[\]]+\s+)+([A-Za-z_][\w]*)\s*\(([^;{}]*)\)\s*(?:const\s*)?(?:noexcept\s*)?(?:->\s*[^{]+)?\{",
@@ -120,6 +127,7 @@ PATTERN_EXTENSIONS = {
     "go_func": {".go"},
     "csharp_method": {".cs", ".csx"},
     "rust_function": {".rs"},
+    "dart_function": {".dart"},
     "c_cpp_function": {".c", ".h", ".cc", ".cpp", ".cxx", ".hh", ".hpp", ".hxx"},
 }
 

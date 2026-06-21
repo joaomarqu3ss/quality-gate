@@ -1,0 +1,36 @@
+scan:
+  include_extensions:
+    - ".dart"
+  exclude_dirs:
+    - ".git"
+    - ".dart_tool"
+    - ".pub-cache"
+    - ".gradle"
+    - "build"
+    - "coverage"
+    - "Pods"
+    - ".idea"
+    - ".vscode"
+  exclude_files:
+    - "*.g.dart"
+    - "*.freezed.dart"
+    - "*.gen.dart"
+    - "*.gr.dart"
+    - "*.mocks.dart"
+    - "*.generated.dart"
+
+coverage:
+  paths:
+    - "coverage/lcov.info"
+    - "lcov.info"
+    - "coverage/coverage.info"
+
+rules:
+  duplicated_functions:
+    ignore_names:
+      - "build"
+      - "createState"
+      - "initState"
+      - "dispose"
+      - "didChangeDependencies"
+      - "didUpdateWidget"

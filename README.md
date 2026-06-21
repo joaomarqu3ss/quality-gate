@@ -9,6 +9,7 @@ Ele foi pensado para reforçar os pilares de **High Quality Code**:
 - **Reliability & Security:** valida coverage mínimo como indicador inicial de confiabilidade.
 - **Modularity:** incentiva arquivos menores e componentes mais independentes.
 - **Efficiency:** limita o escopo escaneado e evita ruído de pastas geradas.
+- **Documentation Readability:** alerta sobre documentação longa, sem H1 ou com seções difíceis de revisar em PR.
 
 ## Arquivos
 
@@ -40,6 +41,7 @@ Use um profile quando quiser aplicar defaults por stack:
 ```bash
 python quality_gate.py --config quality-gate.yml --profile rust --root .
 python quality_gate.py --config quality-gate.yml --profile c-cpp --root .
+python quality_gate.py --config quality-gate.yml --profile flutter --root .
 python quality_gate.py --config quality-gate.yml --profile java-spring --root .
 ```
 
@@ -64,7 +66,12 @@ Por padrão, os relatórios saem em:
 ```text
 quality-gate-report/quality-gate-report.json
 quality-gate-report/quality-gate-report.html
+quality-gate-report/quality-gate-report.md
 ```
+
+O Markdown é o formato mais direto para comentários de PR e para o
+`GITHUB_STEP_SUMMARY`. O HTML é melhor para inspeção visual completa como
+artefato do workflow.
 
 ## Profiles por stack
 
@@ -83,6 +90,7 @@ profiles/csharp-dotnet.yml
 profiles/node.yml
 profiles/python.yml
 profiles/rust.yml
+profiles/flutter.yml
 profiles/c-cpp.yml
 ```
 
@@ -111,6 +119,49 @@ coverage/tarpaulin.xml
 target/llvm-cov/lcov.info
 coverage/coverage.info
 ```
+
+## Documentação e PRs
+
+Além das métricas de código, o gate avalia documentação Markdown para facilitar
+a revisão em pull requests:
+
+```yaml
+documentation:
+  enabled: true
+  max_lines_per_doc: 300
+  max_section_lines: 120
+  max_heading_depth: 4
+  require_h1: true
+```
+
+Essas regras geram warnings para documentos longos, seções extensas, ausência de
+H1 e hierarquia de headings profunda demais. Por padrão, `quality-gate-report/`
+é ignorado para evitar que relatórios gerados entrem no próprio scan.
+
+### Documentação pós-review com LLM
+
+Opcionalmente, o gate pode chamar um LLM depois da revisão completa para gerar
+uma documentação pós-review em Markdown. A chave nunca deve ser versionada; use
+variável de ambiente ou secret do CI:
+
+```yaml
+llm_documentation:
+  enabled: true
+  provider: "openai-compatible"
+  endpoint: "https://api.openai.com/v1/chat/completions"
+  api_key_env: "OPENAI_API_KEY"
+  model_env: "QUALITY_GATE_LLM_MODEL"
+  model: ""
+  output_file: "quality-gate-ai-review.md"
+  validate_output: true
+  fail_if_unavailable: false
+  fail_if_invalid: false
+```
+
+Quando habilitado, o LLM recebe o resumo do gate, findings, o relatório Markdown
+e contexto de arquivos escaneados dentro dos limites configurados. Revise essa
+política antes de ativar em repositórios com código sensível ou restrições de
+compliance.
 
 ### Angular / TypeScript
 
@@ -158,6 +209,16 @@ cargo llvm-cov --lcov --output-path target/llvm-cov/lcov.info
 python quality_gate.py --config quality-gate.yml --profile rust --root .
 ```
 
+### Flutter / Dart
+
+Use o profile `flutter`. Ele valida arquivos `.dart`, ignora artefatos comuns
+de build/codegen e lê o coverage padrão gerado por `flutter test --coverage`:
+
+```bash
+flutter test --coverage
+python quality_gate.py --config quality-gate.yml --profile flutter --root .
+```
+
 ### C / C++
 
 Use o profile `c-cpp`. O gate valida arquivos `.c`, `.h`, `.cc`, `.cpp`,
@@ -194,7 +255,28 @@ jobs:
         run: pip install pyyaml
 
       - name: Run Quality Gate
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          QUALITY_GATE_LLM_MODEL: ${{ vars.QUALITY_GATE_LLM_MODEL }}
         run: python quality_gate.py --config quality-gate.yml --root .
+
+      - name: Publish Quality Gate Summary
+        if: always()
+        run: |
+          if [ -f quality-gate-report/quality-gate-report.md ]; then
+            cat quality-gate-report/quality-gate-report.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+          if [ -f quality-gate-report/quality-gate-ai-review.md ]; then
+            printf '\n\n' >> "$GITHUB_STEP_SUMMARY"
+            cat quality-gate-report/quality-gate-ai-review.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload Quality Gate Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-gate-report
+          path: quality-gate-report/
 ```
 
 ## Ajustes recomendados

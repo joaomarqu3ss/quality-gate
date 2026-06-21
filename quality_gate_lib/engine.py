@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Optional
 
 from quality_gate_lib.config import deep_get, load_quality_gate_config
 from quality_gate_lib.coverage import read_coverage
+from quality_gate_lib.documentation import analyze_documentation
 from quality_gate_lib.models import Finding, GateResult
 from quality_gate_lib.scanner import count_file_lines, find_functions, iter_source_files
 
@@ -123,6 +124,8 @@ def run_quality_gate(config_path: Path, explicit_root: Optional[str] = None, pro
     coverage = read_coverage(root, config)
     coverage_percent = coverage.get("coverage_percent")
     fail_if_missing = bool(deep_get(config, "coverage.fail_if_missing", False))
+    documentation, documentation_findings = analyze_documentation(root, config)
+    findings.extend(documentation_findings)
 
     if coverage.get("enabled"):
         if coverage.get("missing") and fail_if_missing:
@@ -157,6 +160,7 @@ def run_quality_gate(config_path: Path, explicit_root: Optional[str] = None, pro
         "total_functions_detected": total_functions,
         "files_over_line_limit": files_over_limit,
         "coverage": coverage,
+        "documentation": documentation,
         "errors": errors,
         "warnings": warnings,
         "score": score,
@@ -167,6 +171,7 @@ def run_quality_gate(config_path: Path, explicit_root: Optional[str] = None, pro
             "reliability_security": "coverage mínimo e falha controlada no gate",
             "modularity": "arquivos menores e funções menos duplicadas",
             "efficiency": "controle do volume escaneado e higiene de baseline",
+            "documentation_readability": "documentação concisa, com títulos e seções fáceis de revisar no PR",
         },
         "profile": profile_name or config.get("profile") or deep_get(config, "project.profile"),
     }

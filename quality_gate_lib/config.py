@@ -24,6 +24,7 @@ scan:
     - ".go"
     - ".cs"
     - ".rs"
+    - ".dart"
     - ".c"
     - ".h"
     - ".cc"
@@ -39,6 +40,7 @@ scan:
     - "build"
     - "coverage"
     - "target"
+    - ".dart_tool"
     - ".angular"
     - ".idea"
     - ".vscode"
@@ -71,10 +73,55 @@ coverage:
     - "coverage/coverage.info"
   fail_if_missing: false
 
+documentation:
+  enabled: true
+  include_extensions:
+    - ".md"
+    - ".markdown"
+  exclude_dirs:
+    - ".git"
+    - "node_modules"
+    - "dist"
+    - "build"
+    - "coverage"
+    - "target"
+    - ".dart_tool"
+    - ".angular"
+    - ".idea"
+    - ".vscode"
+    - "__pycache__"
+    - "quality-gate-report"
+  exclude_files: []
+  max_lines_per_doc: 300
+  max_section_lines: 120
+  max_heading_depth: 4
+  require_h1: true
+
 reports:
   output_dir: "quality-gate-report"
   json_file: "quality-gate-report.json"
   html_file: "quality-gate-report.html"
+  markdown_file: "quality-gate-report.md"
+
+llm_documentation:
+  enabled: false
+  provider: "openai-compatible"
+  endpoint: "https://api.openai.com/v1/chat/completions"
+  api_key_env: "OPENAI_API_KEY"
+  model_env: "QUALITY_GATE_LLM_MODEL"
+  model: ""
+  output_file: "quality-gate-ai-review.md"
+  timeout_seconds: 60
+  temperature: 0.2
+  max_output_tokens: 2000
+  max_context_chars: 60000
+  max_file_chars: 4000
+  max_files: 80
+  include_source_context: true
+  include_documentation_context: true
+  validate_output: true
+  fail_if_unavailable: false
+  fail_if_invalid: false
 
 rules:
   duplicated_functions:
@@ -91,6 +138,9 @@ rules:
     enabled: true
 
   coverage:
+    enabled: true
+
+  documentation:
     enabled: true
 """
 

@@ -57,6 +57,18 @@ class QualityGateProfilesTest(unittest.TestCase):
             self.assertEqual(config["scan"]["exclude_dirs"], ["target", "__pycache__"])
             self.assertEqual(config["coverage"]["paths"], ["coverage/tarpaulin.xml", "coverage.xml"])
 
+    def test_flutter_profile_scans_dart_and_uses_lcov_coverage(self):
+        repo_root = Path(__file__).resolve().parents[1]
+        config_path = repo_root / "quality-gate.yml"
+
+        config = quality_gate.load_quality_gate_config(config_path, profile_name="flutter")
+
+        self.assertIn(".dart", config["scan"]["include_extensions"])
+        self.assertIn(".dart_tool", config["scan"]["exclude_dirs"])
+        self.assertIn("*.freezed.dart", config["scan"]["exclude_files"])
+        self.assertIn("coverage/lcov.info", config["coverage"]["paths"])
+        self.assertIn("build", config["rules"]["duplicated_functions"]["ignore_names"])
+
 
 class LowLevelLanguageDetectionTest(unittest.TestCase):
     def test_language_specific_patterns_do_not_parse_python_string_snippets_as_c(self):

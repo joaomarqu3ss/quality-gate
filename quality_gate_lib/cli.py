@@ -4,7 +4,8 @@ from pathlib import Path
 
 from quality_gate_lib.config import init_config
 from quality_gate_lib.engine import run_quality_gate
-from quality_gate_lib.reports import print_console_summary, write_reports
+from quality_gate_lib.llm_documentation import run_llm_documentation
+from quality_gate_lib.reports import print_console_summary, resolve_report_paths, write_reports
 
 
 def main() -> int:
@@ -29,9 +30,30 @@ def main() -> int:
     try:
         result = run_quality_gate(config_path, explicit_root=args.root, profile_name=args.profile)
         json_path, html_path = write_reports(result, config_path, explicit_root=args.root, profile_name=args.profile)
+        _, _, markdown_path = resolve_report_paths(config_path, explicit_root=args.root, profile_name=args.profile)
+        llm_result = run_llm_documentation(config_path, result, explicit_root=args.root, profile_name=args.profile)
     except (FileNotFoundError, ValueError) as exc:
         print(f"ERRO: {exc}", file=sys.stderr)
         return 2
 
-    print_console_summary(result, json_path, html_path)
-    return 0 if result.passed else 1
+    print_console_summary(result, json_path, html_path, markdown_path)
+    exit_code = 0 if result.passed else 1
+
+    if llm_result.get("enabled"):
+        if llm_result.get("error"):
+            print(f"Documentação LLM: não gerada ({llm_result['error']})")
+            if llm_result.get("fail_if_unavailable"):
+                exit_code = 2
+        elif llm_result.get("skipped"):
+            print("Documentação LLM: desabilitada ou ignorada.")
+        else:
+            print(f"Documentação LLM: {llm_result.get('output')}")
+            validation_findings = llm_result.get("validation_findings", [])
+            if validation_findings:
+                print(f"Validação da documentação LLM: {len(validation_findings)} finding(s)")
+                if llm_result.get("fail_if_invalid"):
+                    exit_code = 1
+            else:
+                print("Validação da documentação LLM: passou")
+
+    return exit_code
