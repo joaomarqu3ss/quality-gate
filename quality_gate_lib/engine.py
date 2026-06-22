@@ -103,19 +103,20 @@ def run_quality_gate(config_path: Path, explicit_root: Optional[str] = None, pro
                 total_functions += 1
                 if fn["name"] in ignore_function_names:
                     continue
-                duplicate_groups[fn["signature"]].append(fn)
+                duplicate_groups[fn.get("dedupe_key", fn["signature"])].append(fn)
 
         duplicated = {sig: occ for sig, occ in duplicate_groups.items() if len(occ) > 1}
         duplicate_count = len(duplicated)
 
         if duplicate_count > max_dup:
             for signature, occurrences in duplicated.items():
+                display_signature = occurrences[0].get("signature", signature)
                 locations = ", ".join(f'{o["file"]}:{o["line"]}' for o in occurrences[:10])
                 findings.append(
                     Finding(
                         rule="function.duplicate_signature",
                         severity="error",
-                        message=f"Função/método aparentemente repetido: {signature}. Ocorrências: {locations}",
+                        message=f"Função/método aparentemente repetido: {display_signature}. Ocorrências: {locations}",
                         value=len(occurrences),
                         threshold=max_dup,
                     )

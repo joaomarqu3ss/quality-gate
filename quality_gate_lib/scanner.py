@@ -146,6 +146,11 @@ def normalize_params(params: str) -> str:
 
 
 def find_functions(file_path: Path, root: Path) -> List[Dict[str, Any]]:
+    if file_path.suffix.lower() == ".dart":
+        from quality_gate_lib.dart_scanner import find_dart_functions
+
+        return find_dart_functions(file_path, root)
+
     try:
         content = file_path.read_text(encoding="utf-8", errors="ignore")
     except OSError:
