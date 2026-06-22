@@ -28,6 +28,7 @@ coverage:
 rules:
   duplicated_functions:
     ignore_names:
+      - "main"
       - "build"
       - "createState"
       - "initState"
